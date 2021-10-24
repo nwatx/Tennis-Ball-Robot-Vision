@@ -1,8 +1,16 @@
 # Tennis Ball Tracking and Traveling Salesman Solver with Yolov5 + Deep Sort with PyTorch
 
 
+## Demo Video
+
 <div align="center">
-<iframe width="400" height="300" src="https://www.youtube.com/embed/Wa7SO0XiDNM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+[![Tennis Ball Tracking Example](http://img.youtube.com/vi/Wa7SO0XiDNM/0.jpg)](http://www.youtube.com/watch?v=Wa7SO0XiDNM "Tennis Ball Tracking")
+
+The above video demonstrates some simple capabilities of our realtime solver and deep-sort tracking. The model was trained on a separate repository, using a custom dataset.
+
+Our intended pipeline is to be detection -> DeepSort -> Homography Pose Estimation -> TSP Solver -> Path generation -> Spline Interpolation -> Path following -> more detection
+
 <p>
 <img src="MOT16_eval/track_pedestrians.gif" width="400"/> <img src="MOT16_eval/track_all.gif" width="400"/> 
 </p>
