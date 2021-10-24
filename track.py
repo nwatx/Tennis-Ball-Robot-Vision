@@ -1,4 +1,8 @@
 import sys
+import statistics
+
+import numpy as np
+import tsp
 sys.path.insert(0, './yolov5')
 
 from yolov5.models.experimental import attempt_load
@@ -18,7 +22,6 @@ from pathlib import Path
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
-
 
 def detect(opt):
     out, source, yolo_weights, deep_sort_weights, show_vid, save_vid, save_txt, imgsz, evaluate = \
@@ -126,14 +129,19 @@ def detect(opt):
 
                 # pass detections to deepsort
                 outputs = deepsort.update(xywhs.cpu(), confs.cpu(), clss.cpu(), im0)
-                
+
                 # draw boxes for visualization
+
                 if len(outputs) > 0:
+                    # prepare coordinates for traveling salesman problem
+                    coordinates = {}
+
                     for j, (output, conf) in enumerate(zip(outputs, confs)): 
                         
                         bboxes = output[0:4]
                         id = output[4]
                         cls = output[5]
+                        coordinates[id] = (int(statistics.mean([bboxes[0], bboxes[2]])), int(statistics.mean([bboxes[1], bboxes[3]])))
 
                         c = int(cls)  # integer class
                         label = f'{id} {names[c]} {conf:.2f}'
@@ -149,6 +157,22 @@ def detect(opt):
                             with open(txt_path, 'a') as f:
                                f.write(('%g ' * 10 + '\n') % (frame_idx, id, bbox_left,
                                                            bbox_top, bbox_w, bbox_h, -1, -1, -1, -1))  # label format
+                    # print(coordinates)
+                    coordinates_values = list(coordinates.values())
+                
+                    # find the shortest path
+                    tour = tsp.solve(coordinates_values, len(coordinates_values))
+                    print(tour)
+                    for i in range(len(tour)):
+                        j = (i + 1) % len(tour)
+                        cv2.line(im0, ((coordinates_values[i])[0], (coordinates_values[i])[1]), ((coordinates_values[j])[0], (coordinates_values[j])[1]), (0, 255, 0), 2)
+                        cv2.putText(im0, f'{i}',
+                        (
+                            int(statistics.mean([coordinates_values[i][0], coordinates_values[j][0]])),
+                            int(statistics.mean([coordinates_values[i][1], coordinates_values[j][1]]))),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2
+                        )
+
 
             else:
                 deepsort.increment_ages()

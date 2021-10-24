@@ -1,0 +1,1 @@
+python3 track.py --source /home/neo/Downloads/NmFtqc8.mp4 --img 640 --yolo_weights best.pt --show-vid --save-vid
