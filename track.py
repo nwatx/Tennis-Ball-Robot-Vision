@@ -1,6 +1,8 @@
 import sys
 import statistics
+import homography
 
+import matplotlib.pyplot as plt
 import numpy as np
 import tsp
 sys.path.insert(0, './yolov5')
@@ -111,7 +113,7 @@ def detect(opt):
             s += '%gx%g ' % img.shape[2:]  # print string
             save_path = str(Path(out) / Path(p).name)
 
-            annotator = Annotator(im0, line_width=2, pil=not ascii)
+            annotator = Annotator(im0, line_width=1, pil=not ascii)
 
             if det is not None and len(det):
                 # Rescale boxes from img_size to im0 size
@@ -139,6 +141,9 @@ def detect(opt):
                     for j, (output, conf) in enumerate(zip(outputs, confs)): 
                         
                         bboxes = output[0:4]
+                        x_dist = homography.get_dist(bboxes[0], bboxes[2])
+                        y_dist = homography.get_dist(bboxes[1], bboxes[3])
+                        plt.plot(x_dist, y_dist, 'ro', markersize=1)
                         id = output[4]
                         cls = output[5]
                         coordinates[id] = (int(statistics.mean([bboxes[0], bboxes[2]])), int(statistics.mean([bboxes[1], bboxes[3]])))
@@ -203,6 +208,10 @@ def detect(opt):
 
                     vid_writer = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
                 vid_writer.write(im0)
+            plt.xlim((0, 10))
+            plt.ylim((0, 10))
+            plt.savefig(f'{save_path}{i}.png')
+            plt.clf()
 
     if save_txt or save_vid:
         print('Results saved to %s' % os.getcwd() + os.sep + out)

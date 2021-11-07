@@ -114,5 +114,3 @@ def solve(points, n):
 	# 	plt.plot([points[tour[i]][0], points[tour[j]][0]], [points[tour[i]][1], points[tour[j]][1]])
 	# plt.show()
 	return tour
-
-solve(points=[(49, 366), (145, 368)], n=2)
